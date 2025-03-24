@@ -1,43 +1,37 @@
-def print_grid_1(grid):
+def load_grid(file_path):
+    with open(file_path, 'r', encoding='utf-8') as f:
+        lines = [line.strip() for line in f if line.strip()]
+        return [
+            [
+                [list(line[i:i+3]) for i in range(0, 9, 3)]
+                for line in lines[bloc_i:bloc_i+3]
+            ]
+            for bloc_i in range(0, 9, 3)
+        ]
 
+def print_simple_grid(grid):
 
-    print("     A   B   C    D   E   F    G   H   I")
-    print("  ╔═══╤═══╤═══╦═══╤═══╤═══╦═══╤═══╤═══╗")
+    # Convert load_grid() in flat grid
+    flat_grid = []
+    for big_block in grid:
+        for line in zip(*big_block):
+            flat_grid.append([cell for part in line for cell in part])
     
-    for i in range(9):
-        print(f"{i+1} ║", end="")
-        
-        for j in range(9):
-            num = grid[i][j]
-            content = '.' if num == '_' else str(num)
-            print(f" {content} ", end="")
-            
+    # Display grid
+    print("+-------+-------+-------+")
+    for i, row in enumerate(flat_grid):
+        print("|", end=" ")
+        for j, num in enumerate(row):
+            print(num if num != '_' else '.', end=" ")
             if j in (2, 5):
-                print("║", end="")
-            elif j != 8:
-                print("│", end="")
-        
-        print("║")
-        
+                print("|", end=" ")
+        print("|")
         if i in (2, 5):
-            print("  ╠═══╪═══╪═══╬═══╪═══╪═══╬═══╪═══╪═══╣")
-        elif i != 8:
-            print("  ╟───┼───┼───╫───┼───┼───╫───┼───┼───╢")
-    
-    print("  ╚═══╧═══╧═══╩═══╧═══╧═══╩═══╧═══╧═══╝")
+            print("+-------+-------+-------+")
+    print("+-------+-------+-------+")
 
-# Définition de la grille AVANT son utilisation
-grid_1 = [
-    [7, 2, 9, '_', '_', '_', 3, '_', '_'],
-    ['_', '_', 1, '_', 6, '_', 8, '_', '_'],
-    ['_', '_', '_', '_', 4, '_', '_', 6, '_'],
-    [9, 6, '_', '_', '_', 4, 1, '_', 8],
-    ['_', 4, 8, 7, '_', 5, '_', 9, 6],
-    ['_', '_', 5, 6, '_', 8, '_', '_', 3],
-    ['_', '_', '_', 4, '_', 2, '_', 1, '_'],
-    [8, 5, '_', '_', 6, '_', 3, 2, 7],
-    [1, '_', '_', 8, 5, '_', '_', '_', '_']
-]
 
-print("Sudoku:")
-print_grid_1(grid_1)
+
+grid = load_grid('grids/sudoku.txt')
+print(grid)
+print_simple_grid(grid)
