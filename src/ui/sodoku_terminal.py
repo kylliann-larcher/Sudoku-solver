@@ -26,14 +26,18 @@ class SudokuGrid:
 
             match choix: 
                 case "1": 
+                    print("Bon choix")
                     return 'C:/Users/Windows/Desktop/projets/1a/sodoku/Sudoku-solver/grids/sudoku.txt'
                 case "2": 
                     return 'C:/Users/Windows/Desktop/projets/1a/sodoku/Sudoku-solver/grids/sudoku2.txt'
                 case "3": 
+                    print("Bon choix")
                     return 'C:/Users/Windows/Desktop/projets/1a/sodoku/Sudoku-solver/grids/sudoku3.txt'
                 case "4": 
+                    print("Bon choix")                    
                     return 'C:/Users/Windows/Desktop/projets/1a/sodoku/Sudoku-solver/grids/sudoku4.txt'
                 case "5": 
+                    print("Bon choix")
                     return 'C:/Users/Windows/Desktop/projets/1a/sodoku/Sudoku-solver/grids/evilsudoku.txt'
                 case "0":
                     print("Au revoir")
@@ -43,7 +47,7 @@ class SudokuGrid:
 
 
     def load_grid(self, file_path=None):
-        """Charge la grille depuis un fichier"""
+
         if not file_path:
             file_path = self.choose_level()
             if not file_path:  # Si l'utilisateur a choisi de quitter
@@ -83,7 +87,8 @@ class SudokuGrid:
 
 # Exemple d'utilisation
 if __name__ == "__main__":
+
     sudoku = SudokuGrid()
-    sudoku.load_grid()  # Demande le niveau interactivement
-    if sudoku.grid is not None:
-        sudoku.print_simple_grid()
+    grid = sudoku.load_grid()
+    print(grid)
+
