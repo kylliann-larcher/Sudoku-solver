@@ -10,41 +10,47 @@ class SudokuGrid:
             self.load_grid(file_path)
 
     def choose_level(self):
-
+    
         while True:
-            print("""
-            === MENU DES NIVEAUX ===
-            1. Niveau Facile
-            2. Niveau Intermédiaire
-            3. Niveau Difficile
-            4. Niveau Expert
-            5. Niveau Légendaire
-            0. Quitter
-            """)
+            print("\n" + "═" * 32)
+            print(" " * 9 + "MENU DES NIVEAUX")
+            print("═" * 32)
+            print("╔══════════════════════════════╗")
+            print("║  1. Niveau Facile            ║")
+            print("║  2. Niveau Intermédiaire     ║")
+            print("║  3. Niveau Difficile         ║")
+            print("║  4. Niveau Expert            ║")
+            print("║  5. Niveau Légendaire        ║")
+            print("║                              ║")
+            print("║  0. Quitter                  ║")
+            print("╚══════════════════════════════╝")
+            print("═" * 32)
             
-            choix = input("Veuillez choisir un niveau (0-5) : ").strip()
+            choice = input("Veuillez choisir un niveau (0-5) : ").strip()
 
-            match choix: 
+            match choice: 
                 case "1": 
-                    print("Bon choix")
+                    print("\n>>>>>>>>>>>>> NIVEAU FACILE <<<<<<<<<<<<<")
                     return 'C:/Users/Windows/Desktop/projets/1a/sodoku/Sudoku-solver/grids/sudoku.txt'
                 case "2": 
+                    print("\n>>>>>>>>>> NIVEAU INTERMEDIAIRE <<<<<<<<<<")
                     return 'C:/Users/Windows/Desktop/projets/1a/sodoku/Sudoku-solver/grids/sudoku2.txt'
                 case "3": 
-                    print("Bon choix")
+                    print("\n>>>>>>>>>>>>> NIVEAU DIFFICILE <<<<<<<<<<<<")
                     return 'C:/Users/Windows/Desktop/projets/1a/sodoku/Sudoku-solver/grids/sudoku3.txt'
                 case "4": 
-                    print("Bon choix")                    
+                    print("\n>>>>>>>>>>>>> NIVEAU EXPERT <<<<<<<<<<<<<<")
                     return 'C:/Users/Windows/Desktop/projets/1a/sodoku/Sudoku-solver/grids/sudoku4.txt'
                 case "5": 
-                    print("Bon choix")
+                    print("\n>>>>>>>>>> NIVEAU LEGENDAIRE <<<<<<<<<<<<")
                     return 'C:/Users/Windows/Desktop/projets/1a/sodoku/Sudoku-solver/grids/evilsudoku.txt'
                 case "0":
-                    print("Au revoir")
+                    print("\n" + "═" * 35)
+                    print("   Merci d'avoir joué ! Au revoir   ")
+                    print("═" * 35 + "\n")
                     return None
                 case _:
-                    print("Choix invalide, veuillez réessayer.")
-
+                    print("\n⚠ Choix invalide! Veuillez entrer un nombre entre 0 et 5.")
 
     def load_grid(self, file_path=None):
 
@@ -73,22 +79,43 @@ class SudokuGrid:
             print("Aucune grille chargée.")
             return
         
-        print("+-------+-------+-------+")
+        # En-tête avec lettres pour les colonnes
+        print("    A   B   C    D   E   F  G   H   I")
+        print("  ╔═══╤═══╤═══╦═══╤═══╤═══╦═══╤═══╤═══╗")
+    
         for i, row in enumerate(self.grid):
-            print("|", end=" ")
+            # Numéro de ligne à gauche
+            print(f"{i+1} ║", end="")
+            
             for j, num in enumerate(row):
-                print(num if num != '_' else '.', end=" ")
+                # Contenu de la case (centre)
+                content = num if num not in ('0', '_') else ' '
+                print(f" {content} ", end="")
+                
+                # Séparateurs verticaux
                 if j in (2, 5):
-                    print("|", end=" ")
-            print("|")
+                    print("║", end="")
+                elif j < 8:
+                    print("│", end="")
+            
+            # Numéro de ligne à droite
+            print(f"║ {i+1}")
+            
+            # Séparateurs horizontaux
             if i in (2, 5):
-                print("+-------+-------+-------+")
-        print("+-------+-------+-------+")
+                print("  ╠═══╪═══╪═══╬═══╪═══╪═══╬═══╪═══╪═══╣")
+            elif i < 8:
+                print("  ╟───┼───┼───╫───┼───┼───╫───┼───┼───╢")
+        
+        # Pied de grille
+        print("  ╚═══╧═══╧═══╩═══╧═══╧═══╩═══╧═══╧═══╝")
 
 # Exemple d'utilisation
 if __name__ == "__main__":
 
     sudoku = SudokuGrid()
     grid = sudoku.load_grid()
-    print(grid)
+
+    display_grid=sudoku.print_simple_grid()
+    print(display_grid)
 
