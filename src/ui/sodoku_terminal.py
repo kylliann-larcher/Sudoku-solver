@@ -10,7 +10,7 @@ class SudokuGrid:
             self.load_grid(file_path)
 
     def choose_level(self):
-        """Affiche le menu des niveaux et retourne le fichier choisi"""
+
         while True:
             print("""
             === MENU DES NIVEAUX ===
