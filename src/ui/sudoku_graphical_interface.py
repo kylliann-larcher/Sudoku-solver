@@ -2,7 +2,14 @@ import pygame
 import sys
 import numpy as np
 from pygame.locals import *
-from sodoku_terminal import SudokuGrid
+
+import os
+
+# Add the project root directory to Python path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
+from src.models.sudoku import SudokuGrid
+
 
 # Initialize Pygame
 pygame.init()

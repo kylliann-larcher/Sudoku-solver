@@ -2,12 +2,16 @@ import numpy as np
 
 class SudokuGrid:
     
-    def __init__(self):
-        file_path = self.user_choice()
+    def __init__(self,grid=None,file_path=None ):
+        file_path = None
         if file_path:
             self.load_grid(file_path)  # Charge la grille
         else:
             print(" File not found ")
+        if grid is None:
+            self.grid = [[0 for _ in range(9)] for _ in range(9)]
+        else:
+            self.grid = grid
 
     def choose_level(self):
         while True:
@@ -144,3 +148,6 @@ class SudokuGrid:
                 case _:
                     print("\n⚠ Choix invalide! Veuillez choisir A ou B.")
                     print("═" * 32)
+
+if __name__ == "__main__":
+    ()
