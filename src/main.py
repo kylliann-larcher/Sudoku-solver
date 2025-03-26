@@ -1,15 +1,24 @@
 from models.sudoku import SudokuGrid
-from solvers.brute_force import BruteForceSolver
+from solvers.backtracking import BruteForceSolver
 
-# Load Sudoku Grid
-sudoku = SudokuGrid()
-sudoku.load_from_file("tests/sudoku.txt")
-sudoku.display()
-print(sudoku.is_valid_move(0, 1, 5))  # Test move validity
-# Solve using Brute Force
-solver = BruteForceSolver(sudoku)
-if solver.solve():
-    print("Sudoku solved using brute force:")
-    sudoku.display()
-else:
-    print("No solution found.")
+def main():
+    sudoku = SudokuGrid()
+    solver_choice = sudoku.choose_solver()
+
+    if solver_choice == "A":
+        # Ajoutez ici l'appel au solveur
+        print("Force brut sélectionné, mais non implémenté dans cet exemple.")
+        
+        
+    elif solver_choice == "B":
+        solver = BruteForceSolver(sudoku)
+        if solver.solve():
+            print("Sudoku résolu en utilisant le backtracking :")
+            sudoku.print_simple_grid()
+        else:
+            print("Aucune solution trouvée.")
+    else:
+        print("Choix de solveur invalide.")
+
+if __name__ == "__main__":
+    main()
