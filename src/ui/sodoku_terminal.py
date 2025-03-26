@@ -115,6 +115,7 @@ if __name__ == "__main__":
 
     sudoku = SudokuGrid()
     grid = sudoku.load_grid()
+    print(grid)
 
     display_grid=sudoku.print_simple_grid()
     print(display_grid)
