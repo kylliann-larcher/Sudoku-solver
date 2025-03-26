@@ -118,4 +118,3 @@ if __name__ == "__main__":
 
     display_grid=sudoku.print_simple_grid()
     print(display_grid)
-
