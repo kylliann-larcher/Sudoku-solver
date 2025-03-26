@@ -1,5 +1,5 @@
 from models.sudoku import SudokuGrid
-from solvers.backtracking import BruteForceSolver
+from solvers.backtracking import BacktrakingceSolver
 
 def main():
     sudoku = SudokuGrid()
@@ -11,7 +11,7 @@ def main():
         
         
     elif solver_choice == "B":
-        solver = BruteForceSolver(sudoku)
+        solver = BacktrakingceSolver(sudoku)
         if solver.solve():
             print("Sudoku résolu en utilisant le backtracking :")
             sudoku.print_simple_grid()
