@@ -2,16 +2,14 @@ import numpy as np
 
 class SudokuGrid:
     
-    def __init__(self,grid=None,file_path=None ):
-        file_path = None
-        if file_path:
-            self.load_grid(file_path)  # Charge la grille
-        else:
-            print(" File not found ")
+    def __init__(self, grid=None, file_path=None):
         if grid is None:
             self.grid = [[0 for _ in range(9)] for _ in range(9)]
         else:
             self.grid = grid
+        
+        if file_path:
+            self.load_grid(file_path)
 
     def choose_level(self):
         while True:
@@ -34,29 +32,28 @@ class SudokuGrid:
     def user_choice(self):
         choice = self.choose_level()
         match choice: 
-                case "1": 
-                    print("\n>>>>>>>>>>>>> NIVEAU FACILE <<<<<<<<<<<<<")
-                    return 'grids/sudoku.txt'
-                case "2": 
-                    print("\n>>>>>>>>>> NIVEAU INTERMEDIAIRE <<<<<<<<<<")
-                    return 'grids/sudoku2.txt'
-                case "3": 
-                    print("\n>>>>>>>>>>>>> NIVEAU DIFFICILE <<<<<<<<<<<<")
-                    return 'grids/sudoku3.txt'
-                case "4": 
-                    print("\n>>>>>>>>>>>>> NIVEAU EXPERT <<<<<<<<<<<<<<")
-                    return 'grids/sudoku4.txt'
-                case "5": 
-                    print("\n>>>>>>>>>> NIVEAU LEGENDAIRE <<<<<<<<<<<<")
-                    return 'grids/evilsudoku.txt'
-                case "0":
-                    print("\n" + "═" * 35)
-                    print("   Merci d'avoir joué ! Au revoir   ")
-                    print("═" * 35 + "\n")
-                    return None
-                case _:
-                    print("\n⚠ Choix invalide! Veuillez entrer un nombre entre 0 et 5.")
-
+            case "1": 
+                print("\n>>>>>>>>>>>>> NIVEAU FACILE <<<<<<<<<<<<<")
+                return 'grids/sudoku.txt'
+            case "2": 
+                print("\n>>>>>>>>>> NIVEAU INTERMEDIAIRE <<<<<<<<<<")
+                return 'grids/sudoku2.txt'
+            case "3": 
+                print("\n>>>>>>>>>>>>> NIVEAU DIFFICILE <<<<<<<<<<<<")
+                return 'grids/sudoku3.txt'
+            case "4": 
+                print("\n>>>>>>>>>>>>> NIVEAU EXPERT <<<<<<<<<<<<<<")
+                return 'grids/sudoku4.txt'
+            case "5": 
+                print("\n>>>>>>>>>> NIVEAU LEGENDAIRE <<<<<<<<<<<<")
+                return 'grids/evilsudoku.txt'
+            case "0":
+                print("\n" + "═" * 35)
+                print("   Merci d'avoir joué ! Au revoir   ")
+                print("═" * 35 + "\n")
+                return None
+            case _:
+                print("\n⚠ Choix invalide! Veuillez entrer un nombre entre 0 et 5.")
 
     def load_grid(self, file_path):
         if not file_path:
@@ -77,7 +74,6 @@ class SudokuGrid:
             return None
 
     def print_simple_grid(self):
-
         if self.grid is None:
             print("Aucune grille chargée.")
             return
@@ -127,7 +123,6 @@ class SudokuGrid:
             print("╚══════════════════════════════╝")
             print("═" * 32)
 
-
             choice_s = input("Veuillez choisir un algorithme (A ou B): ").strip().upper()
 
             match choice_s:
@@ -150,4 +145,4 @@ class SudokuGrid:
                     print("═" * 32)
 
 if __name__ == "__main__":
-    ()
+    pass
