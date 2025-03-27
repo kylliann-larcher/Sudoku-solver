@@ -1,123 +1,303 @@
 import pygame
 import sys
+import numpy as np
+from pygame.locals import *
+import os
+
+# Add project root to path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
+from src.models.sudoku import SudokuGrid
+from src.solvers.backtracking import BacktrakingceSolver
 
 # Initialize Pygame
 pygame.init()
 
-# Define colors
+# Colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-GRAY = (200, 200, 200)
-BLUE = (0, 0, 255)
+GRAY = (160, 160, 170)
+PRIMARY_COLOR = (72, 172, 239)
+SECONDARY_COLOR = (255, 94, 87)
+HIGHLIGHT_COLOR = (255, 216, 77)
+SHADOW_COLOR = (100, 110, 130)
+BACKGROUND_COLOR = (30, 40, 60)
 
-# Define dimensions
-WIDTH, HEIGHT = 600, 600  # Window size
-GRID_SIZE = 9  # Size of the Sudoku grid (9x9)
-GRID_WIDTH = 400  # Reduced grid width
-GRID_HEIGHT = 400  # Reduced grid height
-CELL_SIZE = GRID_WIDTH // GRID_SIZE  # Cell size
-MARGIN_TOP = 100  # Top margin
-MARGIN_LEFT = (WIDTH - GRID_WIDTH) // 2  # Left margin to center the grid
+# Dimensions
+WIDTH, HEIGHT = 600, 700
+GRID_SIZE = 9
+GRID_WIDTH = 450
+GRID_HEIGHT = 450
+CELL_SIZE = GRID_WIDTH // GRID_SIZE
+MARGIN_TOP = (HEIGHT - GRID_HEIGHT) // 2
+MARGIN_LEFT = (WIDTH - GRID_WIDTH) // 2
 
-# Create the window
+# Window
 window = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Sudoku")
 
-# Font for the numbers
-font = pygame.font.SysFont('Arial', 30)  # Slightly smaller font
+# Fonts
+font = pygame.font.SysFont('Arial', 30)
+title_font = pygame.font.SysFont('Arial', 40, bold=True)
+button_font = pygame.font.SysFont('Arial', 24, bold=True)
 
-# Function to draw the grid
 def draw_grid():
-    # Draw cells
+    # Grid background
+    grid_rect = pygame.Rect(MARGIN_LEFT, MARGIN_TOP, GRID_WIDTH, GRID_HEIGHT)
+    pygame.draw.rect(window, WHITE, grid_rect, border_radius=15)
+
+    # Cells
     for i in range(GRID_SIZE):
         for j in range(GRID_SIZE):
-            # Rectangle for each cell
             rect = pygame.Rect(
-                MARGIN_LEFT + i * CELL_SIZE, 
-                MARGIN_TOP + j * CELL_SIZE, 
-                CELL_SIZE, 
+                MARGIN_LEFT + i * CELL_SIZE,
+                MARGIN_TOP + j * CELL_SIZE,
+                CELL_SIZE,
                 CELL_SIZE
             )
-            # Draw with thin border
             pygame.draw.rect(window, WHITE, rect)
             pygame.draw.rect(window, GRAY, rect, 1)
-    
-    # Draw the 3x3 subgrid lines (thicker)
+
+    # Sub-grids
     for i in range(0, GRID_SIZE + 1, 3):
-        # Vertical lines
         pygame.draw.line(
-            window, BLACK, 
-            (MARGIN_LEFT + i * CELL_SIZE, MARGIN_TOP), 
-            (MARGIN_LEFT + i * CELL_SIZE, MARGIN_TOP + GRID_HEIGHT), 
+            window, BLACK,
+            (MARGIN_LEFT + i * CELL_SIZE, MARGIN_TOP),
+            (MARGIN_LEFT + i * CELL_SIZE, MARGIN_TOP + GRID_HEIGHT),
             3
         )
-        # Horizontal lines
         pygame.draw.line(
-            window, BLACK, 
-            (MARGIN_LEFT, MARGIN_TOP + i * CELL_SIZE), 
-            (MARGIN_LEFT + GRID_WIDTH, MARGIN_TOP + i * CELL_SIZE), 
+            window, BLACK,
+            (MARGIN_LEFT, MARGIN_TOP + i * CELL_SIZE),
+            (MARGIN_LEFT + GRID_WIDTH, MARGIN_TOP + i * CELL_SIZE),
             3
         )
 
-# Function to draw the numbers in the grid
-def draw_numbers(grid):
-    for i in range(GRID_SIZE):
-        for j in range(GRID_SIZE):
-            # Check if cell is not empty and indices are within range
-            if i < len(grid) and j < len(grid[i]) and grid[i][j] != 0:
-                # Calculate the center position of the number
+def draw_numbers(grid, solved=False, original_grid=None):
+    if grid is None:
+        return
+
+    for i in range(len(grid)):
+        for j in range(len(grid[i])):
+            if grid[i][j] != 0:
                 x = MARGIN_LEFT + j * CELL_SIZE + CELL_SIZE // 2
                 y = MARGIN_TOP + i * CELL_SIZE + CELL_SIZE // 2
-                
-                # Create the text
-                text = font.render(str(grid[i][j]), True, BLACK)
-                # Center the text in the cell
+
+                # Déterminer la couleur
+                if solved and original_grid and original_grid[i][j] == 0:
+                    color = (0, 180, 0)  # Vert pour les nombres résolus
+                    # Fond légèrement coloré
+                    cell_rect = pygame.Rect(
+                        MARGIN_LEFT + j * CELL_SIZE + 1,
+                        MARGIN_TOP + i * CELL_SIZE + 1,
+                        CELL_SIZE - 2,
+                        CELL_SIZE - 2
+                    )
+                    pygame.draw.rect(window, (230, 255, 230), cell_rect)
+                else:
+                    color = BLACK  # Noir pour les nombres initiaux
+
+                text = font.render(str(grid[i][j]), True, color)
                 text_rect = text.get_rect(center=(x, y))
-                # Draw the text
                 window.blit(text, text_rect)
 
-example_grid = [
-    [7, 2, 9, '_', '_', '_', 3, '_', '_'],
-    ['_', '_', 1, '_', 6, '_', 8, '_', '_'],
-    ['_', '_', '_', '_', 4, '_', '_', 6, '_'],
-    [9, 6, '_', '_', '_', 4, 1, '_', 8],
-    ['_', 4, 8, 7, '_', 5, '_', 9, 6],
-    ['_', '_', 5, 6, '_', 8, '_', '_', 3],
-    ['_', '_', '_', 4, '_', 2, '_', 1, '_'],
-    [8, 5, '_', '_', 6, '_', 3, 2, 7],
-    [1, '_', '_', 8, 5, '_', '_', '_', '_']
-]
+def draw_menu_algo():
+    title_menu = title_font.render("NEURALGRID - ALGORITHMS", True, WHITE)
+    window.blit(title_menu, (WIDTH // 2 - title_menu.get_width() // 2, 30))
 
+    choose_algo = font.render("Choose an Algorithm", True, WHITE)
+    window.blit(choose_algo, (WIDTH // 2 - choose_algo.get_width() // 2, 80))
 
-# Main game loop
+    buttons = []
+    algo_button = [
+        ("Brute Force Algorithm", 1),
+        ("Backtracking Algorithm", 2),
+    ]
+
+    button_width = 300
+    button_height = 50
+    spacing = 20
+    total_height = len(algo_button) * (button_height + spacing) - spacing
+    start_y = (HEIGHT - total_height) // 2
+
+    for i, (text, algo_id) in enumerate(algo_button):
+        button_y = start_y + i * (button_height + spacing)
+
+        button_rect = pygame.Rect(
+            WIDTH // 2 - button_width // 2,
+            button_y,
+            button_width,
+            button_height
+        )
+
+        color = PRIMARY_COLOR if algo_id != 0 else SECONDARY_COLOR
+
+        pygame.draw.rect(window, color, button_rect, border_radius=10)
+        pygame.draw.rect(window, SHADOW_COLOR, button_rect, 3, border_radius=10)
+
+        text_surf = button_font.render(text, True, WHITE)
+        text_rect = text_surf.get_rect(center=button_rect.center)
+        window.blit(text_surf, text_rect)
+
+        buttons.append((algo_id, button_rect))
+
+    return buttons
+
+def draw_level_buttons():
+    title = title_font.render("Choose a Level", True, WHITE)
+    window.blit(title, (WIDTH // 2 - title.get_width() // 2, 40))
+
+    levels = [
+        ("Easy", 1),
+        ("Intermediate", 2),
+        ("Difficult", 3),
+        ("Expert", 4),
+        ("Legendary", 5)
+    ]
+
+    buttons = []
+    button_width = 200
+    button_height = 40
+    spacing = 20
+    total_height = len(levels) * (button_height + spacing) - spacing
+    start_y = (HEIGHT - total_height) // 2
+
+    for i, (text, level_id) in enumerate(levels):
+        button_y = start_y + i * (button_height + spacing)
+        button_rect = pygame.Rect(
+            WIDTH // 2 - button_width // 2,
+            button_y,
+            button_width,
+            button_height
+        )
+
+        pygame.draw.rect(window, SECONDARY_COLOR, button_rect, border_radius=10)
+        pygame.draw.rect(window, SHADOW_COLOR, button_rect, 3, border_radius=10)
+
+        text_surf = button_font.render(text, True, WHITE)
+        text_rect = text_surf.get_rect(center=button_rect.center)
+        window.blit(text_surf, text_rect)
+
+        buttons.append((level_id, button_rect))
+
+    return buttons
+
 def main():
+    sudoku = SudokuGrid()
+    grid = None
     running = True
-    
+    show_grid = False
+    show_algo_menu = True
+    selected_algo = None
+    level_buttons = []
+    solved = False
+    original_grid = None  # Pour stocker la grille originale
+
+    level_files = {
+        1: 'C:/Users/Windows/Desktop/projets/1a/sodoku/Sudoku-solver/grids/sudoku.txt',
+        2: 'C:/Users/Windows/Desktop/projets/1a/sodoku/Sudoku-solver/grids/sudoku2.txt',
+        3: 'C:/Users/Windows/Desktop/projets/1a/sodoku/Sudoku-solver/grids/sudoku3.txt',
+        4: 'C:/Users/Windows/Desktop/projets/1a/sodoku/Sudoku-solver/grids/sudoku4.txt',
+        5: 'C:/Users/Windows/Desktop/projets/1a/sodoku/Sudoku-solver/grids/evilsudoku.txt'
+    }
+
+    level_messages = {
+        1: "EASY LEVEL",
+        2: "INTERMEDIATE LEVEL",
+        3: "DIFFICULT LEVEL",
+        4: "EXPERT LEVEL",
+        5: "LEGENDARY LEVEL"
+    }
+
     while running:
-        window.fill(WHITE)
-        
-        # Handle events
+        window.fill(BACKGROUND_COLOR)
+
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+            if event.type == QUIT:
                 running = False
-        
-        # Draw the title
-        title_font = pygame.font.SysFont('Arial', 40)
-        title = title_font.render("Sudoku", True, BLACK)
-        window.blit(title, (WIDTH // 2 - title.get_width() // 2, 40))
-        
-        # Draw the grid
-        draw_grid()
-        
-        # Draw the numbers
-        draw_numbers(example_grid)
-        
-        # Update the display
+
+            if event.type == MOUSEBUTTONDOWN:
+                if show_algo_menu:
+                    algo_buttons = draw_menu_algo()
+                    for algo_id, rect in algo_buttons:
+                        if rect.collidepoint(event.pos):
+                            selected_algo = algo_id
+                            show_algo_menu = False
+                            break
+
+                elif not show_grid:
+                    level_buttons = draw_level_buttons()
+                    for level, rect in level_buttons:
+                        if rect.collidepoint(event.pos):
+                            file_path = level_files.get(level)
+                            if file_path:
+                                grid = sudoku.load_grid(file_path)
+                                original_grid = [row[:] for row in grid]  # Copie de la grille originale
+                                show_grid = True
+                                solved = False
+                                break
+
+                else:
+                    # Bouton Back
+                    back_button = pygame.Rect(WIDTH // 2 - 50, HEIGHT - 60, 100, 40)
+                    if back_button.collidepoint(event.pos):
+                        show_grid = False
+                        grid = None
+                        show_algo_menu = True
+                        selected_algo = None
+                        solved = False
+
+                    # Bouton Solve (uniquement pour backtracking)
+                    if selected_algo == 2:
+                        solve_button = pygame.Rect(WIDTH // 2 - 150, HEIGHT - 60, 100, 40)
+                        if solve_button.collidepoint(event.pos) and not solved:
+                            solver = BacktrakingceSolver(sudoku)
+                            if solver.solve():
+                                grid = sudoku.grid
+                                solved = True
+                            else:
+                                print("Aucune solution trouvée")
+
+        # Affichage
+        if show_algo_menu:
+            algo_buttons = draw_menu_algo()
+        elif not show_grid:
+            level_buttons = draw_level_buttons()
+        else:
+            # Titre
+            title = title_font.render("Sudoku", True, WHITE)
+            window.blit(title, (WIDTH // 2 - title.get_width() // 2, 40))
+
+            # Affichage de la grille
+            draw_grid()
+            draw_numbers(grid, solved, original_grid)
+
+            # Bouton Back
+            back_button = pygame.Rect(WIDTH // 2 - 50, HEIGHT - 60, 100, 40)
+            pygame.draw.rect(window, PRIMARY_COLOR, back_button, border_radius=10)
+            pygame.draw.rect(window, SHADOW_COLOR, back_button, 3, border_radius=10)
+            back_text = button_font.render("Back", True, WHITE)
+            window.blit(back_text, (back_button.centerx - back_text.get_width() // 2, 
+                                   back_button.centery - back_text.get_height() // 2))
+
+            # Bouton Solve (uniquement pour backtracking et si pas déjà résolu)
+            if selected_algo == 2 and not solved:
+                solve_button = pygame.Rect(WIDTH // 2 - 150, HEIGHT - 60, 100, 40)
+                pygame.draw.rect(window, SECONDARY_COLOR, solve_button, border_radius=10)
+                pygame.draw.rect(window, SHADOW_COLOR, solve_button, 3, border_radius=10)
+                solve_text = button_font.render("Solve", True, WHITE)
+                window.blit(solve_text, (solve_button.centerx - solve_text.get_width() // 2,
+                                        solve_button.centery - solve_text.get_height() // 2))
+
+            # Message si résolu
+            if solved:
+                solved_text = font.render("Solved!", True, (0, 200, 0))
+                window.blit(solved_text, (WIDTH // 2 - solved_text.get_width() // 2, HEIGHT - 110))
+
         pygame.display.update()
-    
+
     pygame.quit()
     sys.exit()
 
-# Run the game if this file is executed directly
 if __name__ == "__main__":
     main()
