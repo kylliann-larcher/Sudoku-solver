@@ -29,7 +29,6 @@ MARGIN_LEFT = (WIDTH - GRID_WIDTH) // 2
 window = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("NEURALGRID")
 
-
 current_dir = os.path.dirname(os.path.abspath(__file__))
 font_paths = [
     os.path.join(current_dir, 'fonts', 'Poppins-Regular.ttf'),
@@ -37,6 +36,24 @@ font_paths = [
     'fonts/Poppins-Regular.ttf']
 font_path = next(path for path in font_paths if os.path.exists(path))
 font = pygame.font.Font(font_path, 30)
+try:
+    # Trouver le premier chemin de police qui existe
+    font_path = next(path for path in font_paths if os.path.exists(path))
+    font = pygame.font.Font(font_path, 30)
+    
+    # Faire de même pour les autres polices
+    title_font_path = font_path.replace('Poppins-Regular.ttf', 'Poppins-Bold.ttf')
+    button_font_path = title_font_path
+    
+    title_font = pygame.font.Font(title_font_path, 40)
+    button_font = pygame.font.Font(button_font_path, 24)
+
+except (FileNotFoundError, StopIteration):
+    # Fallback si Poppins n'est pas trouvée
+    font = pygame.font.SysFont('Arial', 30)
+    title_font = pygame.font.SysFont('Arial', 40, bold=True)
+    button_font = pygame.font.SysFont('Arial', 24, bold=True)
+
 class BruteForceSolver:
     def __init__(self,sudokuGrid):
         self.grid = sudokuGrid.grid
@@ -134,7 +151,8 @@ class BruteForceSolver:
         return (self.numberOfPossibilties() * 10**-6)//31536000
 
     def draw_info(self,window, temps_ecoule, solutions_essayees):
-        
+        title = title_font.render("Sudoku", True, WHITE)
+        window.blit(title, (WIDTH // 2 - title.get_width() // 2, 40))
         info_rect = pygame.Rect(10, HEIGHT - 100, WIDTH - 20, 80)  # Adjust dimensions as needed
         # Clear the area by filling it with the background color
         pygame.draw.rect(window, BACKGROUND_COLOR, info_rect)

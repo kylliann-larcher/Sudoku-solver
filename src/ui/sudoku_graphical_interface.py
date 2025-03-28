@@ -308,7 +308,7 @@ def main():
             back_text = button_font.render("Back", True, WHITE)
             window.blit(back_text, (back_button.centerx - back_text.get_width() // 2, 
                                   back_button.centery - back_text.get_height() // 2))
-            
+
 
             if selected_algo == 1 and not solved and not is_solving:
                 solve_button = pygame.Rect(WIDTH // 2 - 100, HEIGHT - 110, 200, 40)
@@ -316,7 +316,7 @@ def main():
                 solve_text = button_font.render("Solve", True, WHITE)
                 window.blit(solve_text, (solve_button.centerx - solve_text.get_width() // 2,
                                         solve_button.centery - solve_text.get_height() // 2))
-                
+
 
             # Bouton Solve (seulement pour l'algorithme 2 et si pas déjà résolu)
             if selected_algo == 2 and not solved and not is_solving:
@@ -325,7 +325,7 @@ def main():
                 solve_text = button_font.render("Solve", True, WHITE)
                 window.blit(solve_text, (solve_button.centerx - solve_text.get_width() // 2,
                                        solve_button.centery - solve_text.get_height() // 2))
-                
+
 
 
             # Affichage du chronomètre
