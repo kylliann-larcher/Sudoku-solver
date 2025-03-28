@@ -218,11 +218,11 @@ def main():
     is_solving = False
 
     level_files = {
-        1: 'C:/Users/Windows/Desktop/projets/1a/sodoku/Sudoku-solver/grids/sudoku.txt',
-        2: 'C:/Users/Windows/Desktop/projets/1a/sodoku/Sudoku-solver/grids/sudoku2.txt',
-        3: 'C:/Users/Windows/Desktop/projets/1a/sodoku/Sudoku-solver/grids/sudoku3.txt',
-        4: 'C:/Users/Windows/Desktop/projets/1a/sodoku/Sudoku-solver/grids/sudoku4.txt',
-        5: 'C:/Users/Windows/Desktop/projets/1a/sodoku/Sudoku-solver/grids/evilsudoku.txt'
+        1: 'grids/sudoku.txt',
+        2: 'grids/sudoku2.txt',
+        3: 'grids/sudoku3.txt',
+        4: 'grids/sudoku4.txt',
+        5: 'grids/evilsudoku.txt'
     }
 
     while running:
