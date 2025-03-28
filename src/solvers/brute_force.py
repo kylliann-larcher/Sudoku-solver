@@ -16,6 +16,7 @@ class BruteForceSolver:
         for row in range(9):
             for col in range(9):
                 if grid[row, col] == 0:
+                    
                     empty_cases.append((row,col))
         return empty_cases
     
@@ -50,10 +51,11 @@ class BruteForceSolver:
                 if not self.is_valid_move(row, col, chiffre):
                     break
                 grid[row, col] = chiffre
+
             else:
                 return True
             for row, col in empty_cases:
-                grid[row, col] = 0
+                grid[row , col] = 0
 
         return False
 
