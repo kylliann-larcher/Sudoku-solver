@@ -272,10 +272,6 @@ def main():
                         is_solving = True
                         # Solve the grid with graphical updates
                         while not solver.BruteForceGraph(grid, window,BACKGROUND_COLOR):
-                            window.fill(BACKGROUND_COLOR)
-                            draw_grid()
-                            draw_numbers(grid, solved, original_grid)
-                            solver.draw_info(window, solver.elapsed_time, solver.solutions_tried, 20, HEIGHT - 150)  # Adjust position as needed
                             pygame.display.flip()
 
                         is_solving = False

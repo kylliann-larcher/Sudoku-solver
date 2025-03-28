@@ -108,9 +108,11 @@ class BruteForceSolver:
         start_time = time.time()
         # Generate all possibilities for the empty cases
         for combinaison in product(range(1, 10), repeat=len(empty_cases)):
-            self.elapsed_time = time.time() - start_time
+            self.elapsed_time = (time.time() - start_time)
             self.solutions_tried += 1
-            self.draw_info(window,self.elapsed_time,self.solutions_tried,bgColor)
+            self.draw_grid()
+            self.draw_numbers(self.grid)
+            self.draw_info(window,self.elapsed_time,self.solutions_tried)
             pygame.display.flip()
             # Try each possibility
             for (row, col), chiffre in zip(empty_cases, combinaison):
@@ -131,17 +133,19 @@ class BruteForceSolver:
     def timeNeededToSolve(self):
         return (self.numberOfPossibilties() * 10**-6)//31536000
 
-    def draw_info(self,window, temps_ecoule, solutions_essayees,bgColor):
-        window.fill(bgColor)
+    def draw_info(self,window, temps_ecoule, solutions_essayees):
+        
+        info_rect = pygame.Rect(10, HEIGHT - 100, WIDTH - 20, 80)  # Adjust dimensions as needed
+        # Clear the area by filling it with the background color
+        pygame.draw.rect(window, BACKGROUND_COLOR, info_rect)
         elapsed_time_text = font.render(f"Elapsed Time: {temps_ecoule:.2f} s", True, WHITE)
         window.blit(elapsed_time_text, (10, 600))
 
         # Draw solutions tried
         solutions_tried_text = font.render(f"Solutions Tried: {solutions_essayees}", True, WHITE)
-        window.blit(solutions_tried_text, (510, 600))  # Offset for the second line
-        pygame.display.flip()
+        window.blit(solutions_tried_text, (10, 640))  # Offset for the second line
 
-    def draw_grid():
+    def draw_grid(self):
     # Grid background
         grid_rect = pygame.Rect(MARGIN_LEFT, MARGIN_TOP, GRID_WIDTH, GRID_HEIGHT)
         pygame.draw.rect(window, WHITE, grid_rect, border_radius=15)
@@ -173,7 +177,7 @@ class BruteForceSolver:
                 3
             )
 
-    def draw_numbers(grid, solved=False, original_grid=None):
+    def draw_numbers(self,grid, solved=False, original_grid=None):
         if grid is None:
             return
 
