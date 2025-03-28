@@ -131,6 +131,7 @@ class SudokuGrid:
                     print("      FORCE BRUTE sélectionnée   ")
                     print("═" * 32)
                     self.print_simple_grid()
+                    print("Solutions essayées:    Solutions totales:    Temps Ecoulé:    Temps nécessaire (en années):")
                     return "A"
 
                 case "B":
