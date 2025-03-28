@@ -144,6 +144,13 @@ class SudokuGrid:
                 case _:
                     print("\n⚠ Choix invalide! Veuillez choisir A ou B.")
                     print("═" * 32)
+    
+    def is_grid_full(self):
+
+        if self.grid is None:
+            return False
+        
+        return not np.any(self.grid == 0) and not np.any(self.grid == '_')
 
 if __name__ == "__main__":
     pass

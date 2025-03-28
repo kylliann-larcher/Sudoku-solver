@@ -3,6 +3,7 @@ import sys
 import numpy as np
 from pygame.locals import *
 import os
+import time
 
 # Add project root to path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
@@ -11,7 +12,6 @@ from src.models.sudoku import SudokuGrid
 from src.solvers.backtracking import BacktrakingceSolver
 from src.solvers.brute_force import BruteForceSolver
 
-# Initialize Pygame
 pygame.init()
 
 # Colors
@@ -35,12 +35,34 @@ MARGIN_LEFT = (WIDTH - GRID_WIDTH) // 2
 
 # Window
 window = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Sudoku")
+pygame.display.set_caption("NEURALGRID")
 
-# Fonts
-font = pygame.font.SysFont('Arial', 30)
-title_font = pygame.font.SysFont('Arial', 40, bold=True)
-button_font = pygame.font.SysFont('Arial', 24, bold=True)
+
+# Chemins possibles pour les fichiers de police
+current_dir = os.path.dirname(os.path.abspath(__file__))
+font_paths = [
+    os.path.join(current_dir, 'fonts', 'Poppins-Regular.ttf'),
+    os.path.join(current_dir, '..', 'ui', 'fonts', 'Poppins-Regular.ttf'),
+    'fonts/Poppins-Regular.ttf'
+]
+
+try:
+    # Trouver le premier chemin de police qui existe
+    font_path = next(path for path in font_paths if os.path.exists(path))
+    font = pygame.font.Font(font_path, 30)
+    
+    # Faire de même pour les autres polices
+    title_font_path = font_path.replace('Poppins-Regular.ttf', 'Poppins-Bold.ttf')
+    button_font_path = title_font_path
+    
+    title_font = pygame.font.Font(title_font_path, 40)
+    button_font = pygame.font.Font(button_font_path, 24)
+
+except (FileNotFoundError, StopIteration):
+    # Fallback si Poppins n'est pas trouvée
+    font = pygame.font.SysFont('Arial', 30)
+    title_font = pygame.font.SysFont('Arial', 40, bold=True)
+    button_font = pygame.font.SysFont('Arial', 24, bold=True)
 
 def draw_grid():
     # Grid background
@@ -107,7 +129,7 @@ def draw_menu_algo():
     window.blit(title_menu, (WIDTH // 2 - title_menu.get_width() // 2, 30))
 
     choose_algo = font.render("Choose an Algorithm", True, WHITE)
-    window.blit(choose_algo, (WIDTH // 2 - choose_algo.get_width() // 2, 80))
+    window.blit(choose_algo, (WIDTH // 2 - choose_algo.get_width() // 2, 140))
 
     buttons = []
     algo_button = [
@@ -115,9 +137,9 @@ def draw_menu_algo():
         ("Backtracking Algorithm", 2),
     ]
 
-    button_width = 300
+    button_width = 400
     button_height = 50
-    spacing = 20
+    spacing = 50
     total_height = len(algo_button) * (button_height + spacing) - spacing
     start_y = (HEIGHT - total_height) // 2
 
@@ -157,9 +179,9 @@ def draw_level_buttons():
     ]
 
     buttons = []
-    button_width = 200
+    button_width = 300
     button_height = 40
-    spacing = 20
+    spacing = 30
     total_height = len(levels) * (button_height + spacing) - spacing
     start_y = (HEIGHT - total_height) // 2
 
@@ -182,7 +204,6 @@ def draw_level_buttons():
         buttons.append((level_id, button_rect))
 
     return buttons
-
 def main():
     sudoku = SudokuGrid()
     grid = None
@@ -192,7 +213,10 @@ def main():
     selected_algo = None
     level_buttons = []
     solved = False
-    original_grid = None  # Pour stocker la grille originale
+    original_grid = None
+    start_time = 0
+    solving_time = 0
+    is_solving = False
 
     level_files = {
         1: 'grids/sudoku.txt',
@@ -200,14 +224,6 @@ def main():
         3: 'grids/sudoku3.txt',
         4: 'grids/sudoku4.txt',
         5: 'grids/evilsudoku.txt'
-    }
-
-    level_messages = {
-        1: "EASY LEVEL",
-        2: "INTERMEDIATE LEVEL",
-        3: "DIFFICULT LEVEL",
-        4: "EXPERT LEVEL",
-        5: "LEGENDARY LEVEL"
     }
 
     while running:
@@ -233,20 +249,21 @@ def main():
                             file_path = level_files.get(level)
                             if file_path:
                                 grid = sudoku.load_grid(file_path)
-                                original_grid = [row[:] for row in grid]  # Copie de la grille originale
+                                original_grid = [row[:] for row in grid]
                                 show_grid = True
                                 solved = False
+                                is_solving = False
                                 break
 
                 else:
                     # Bouton Back
-                    back_button = pygame.Rect(WIDTH // 2 - 50, HEIGHT - 60, 100, 40)
+                    back_button = pygame.Rect(WIDTH // 2 - 100, HEIGHT - 60, 200, 40)
                     if back_button.collidepoint(event.pos):
                         show_grid = False
                         grid = None
                         show_algo_menu = True
-                        selected_algo = None
                         solved = False
+                        is_solving = False
 
                     # Bouton Solve (uniquement pour backtracking)
                     if selected_algo == 2:
@@ -269,13 +286,12 @@ def main():
                             else:
                                 print("Aucune solution trouvée")
 
-        # Affichage
         if show_algo_menu:
             algo_buttons = draw_menu_algo()
         elif not show_grid:
             level_buttons = draw_level_buttons()
         else:
-            # Titre
+            # Affichage du titre
             title = title_font.render("Sudoku", True, WHITE)
             window.blit(title, (WIDTH // 2 - title.get_width() // 2, 40))
 
@@ -284,21 +300,19 @@ def main():
             draw_numbers(grid, solved, original_grid)
 
             # Bouton Back
-            back_button = pygame.Rect(WIDTH // 2 - 50, HEIGHT - 60, 100, 40)
+            back_button = pygame.Rect(WIDTH // 2 - 100, HEIGHT - 60, 200, 40)
             pygame.draw.rect(window, PRIMARY_COLOR, back_button, border_radius=10)
-            pygame.draw.rect(window, SHADOW_COLOR, back_button, 3, border_radius=10)
             back_text = button_font.render("Back", True, WHITE)
             window.blit(back_text, (back_button.centerx - back_text.get_width() // 2, 
-                                   back_button.centery - back_text.get_height() // 2))
+                                  back_button.centery - back_text.get_height() // 2))
 
-            # Bouton Solve (uniquement pour backtracking et si pas déjà résolu)
-            if selected_algo == 2 and not solved:
-                solve_button = pygame.Rect(WIDTH // 2 - 150, HEIGHT - 60, 100, 40)
+            # Bouton Solve (seulement pour l'algorithme 2 et si pas déjà résolu)
+            if selected_algo == 2 and not solved and not is_solving:
+                solve_button = pygame.Rect(WIDTH // 2 - 100, HEIGHT - 110, 200, 40)
                 pygame.draw.rect(window, SECONDARY_COLOR, solve_button, border_radius=10)
-                pygame.draw.rect(window, SHADOW_COLOR, solve_button, 3, border_radius=10)
                 solve_text = button_font.render("Solve", True, WHITE)
                 window.blit(solve_text, (solve_button.centerx - solve_text.get_width() // 2,
-                                        solve_button.centery - solve_text.get_height() // 2))
+                                       solve_button.centery - solve_text.get_height() // 2))
 
             if selected_algo == 1 and not solved:
                 solve_button = pygame.Rect(WIDTH // 2 - 150, HEIGHT - 60, 100, 40)
@@ -312,11 +326,20 @@ def main():
             if solved:
                 solved_text = font.render("Solved!", True, (0, 200, 0))
                 window.blit(solved_text, (WIDTH // 2 - solved_text.get_width() // 2, HEIGHT - 110))
+            # Affichage du chronomètre
+            timer_y = MARGIN_TOP + GRID_HEIGHT + 10
+            
+            if is_solving:
+                current_time = (time.time_ns() - start_time) / 1e6
+                timer_text = font.render(f"Solving... {current_time:.1f} ms", True, WHITE)
+                window.blit(timer_text, (WIDTH // 2 - timer_text.get_width() // 2, timer_y))
+            elif solved:
+                timer_text = font.render(f"Solved in {solving_time:.2f} ms", True, (0, 200, 0))
+                window.blit(timer_text, (WIDTH // 2 - timer_text.get_width() // 2, timer_y))
 
         pygame.display.update()
 
     pygame.quit()
     sys.exit()
-
 if __name__ == "__main__":
     main()
