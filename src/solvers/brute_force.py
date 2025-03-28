@@ -11,6 +11,10 @@ class BruteForceSolver:
 
         return self.BruteForce(self.grid)
 
+    def solveGraph(self):
+
+        return self.BruteForceGraph(self.grid)
+
     def find_empty_cases(self,grid):
         empty_cases = []
         for row in range(9):
@@ -45,6 +49,30 @@ class BruteForceSolver:
             elapsed_time = time.time() - start_time
             self.solutions_tried += 1
             print(f"\r {self.solutions_tried} {self.numberOfPossibilties()} {elapsed_time:6f}      {self.timeNeededToSolve()}",end="")
+            # Try each possibility
+            for (row, col), chiffre in zip(empty_cases, combinaison):
+                if not self.is_valid_move(row, col, chiffre):
+                    break
+                grid[row, col] = chiffre
+            else:
+                return True
+            for row, col in empty_cases:
+                grid[row, col] = 0
+
+        return False
+
+    def BruteForceGraph(self, grid):
+        empty_cases = self.find_empty_cases(self.grid)
+
+        if not empty_cases:  # If there are no empty cells, the grid is solved
+            return True
+        start_time = time.time()
+        # Generate all possibilities for the empty cases
+        for combinaison in product(range(1, 10), repeat=len(empty_cases)):
+            elapsed_time = time.time() - start_time
+            self.solutions_tried += 1
+            print(f"\r {self.solutions_tried} {self.numberOfPossibilties()} {elapsed_time:6f}      {self.timeNeededToSolve()}",end="")
+            
             # Try each possibility
             for (row, col), chiffre in zip(empty_cases, combinaison):
                 if not self.is_valid_move(row, col, chiffre):

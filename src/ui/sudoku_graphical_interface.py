@@ -9,6 +9,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(
 
 from src.models.sudoku import SudokuGrid
 from src.solvers.backtracking import BacktrakingceSolver
+from src.solvers.brute_force import BruteForceSolver
 
 # Initialize Pygame
 pygame.init()
@@ -194,11 +195,11 @@ def main():
     original_grid = None  # Pour stocker la grille originale
 
     level_files = {
-        1: 'C:/Users/Windows/Desktop/projets/1a/sodoku/Sudoku-solver/grids/sudoku.txt',
-        2: 'C:/Users/Windows/Desktop/projets/1a/sodoku/Sudoku-solver/grids/sudoku2.txt',
-        3: 'C:/Users/Windows/Desktop/projets/1a/sodoku/Sudoku-solver/grids/sudoku3.txt',
-        4: 'C:/Users/Windows/Desktop/projets/1a/sodoku/Sudoku-solver/grids/sudoku4.txt',
-        5: 'C:/Users/Windows/Desktop/projets/1a/sodoku/Sudoku-solver/grids/evilsudoku.txt'
+        1: 'grids/sudoku.txt',
+        2: 'grids/sudoku2.txt',
+        3: 'grids/sudoku3.txt',
+        4: 'grids/sudoku4.txt',
+        5: 'grids/evilsudoku.txt'
     }
 
     level_messages = {
@@ -257,6 +258,16 @@ def main():
                                 solved = True
                             else:
                                 print("Aucune solution trouvée")
+                    
+                    if selected_algo == 1:
+                        solve_button = pygame.Rect(WIDTH // 2 - 150, HEIGHT - 60, 100, 40)
+                        if solve_button.collidepoint(event.pos) and not solved:
+                            solver = BruteForceSolver(sudoku)
+                            if solver.solveGraph():
+                                grid = sudoku.grid
+                                solved = True
+                            else:
+                                print("Aucune solution trouvée")
 
         # Affichage
         if show_algo_menu:
@@ -282,6 +293,14 @@ def main():
 
             # Bouton Solve (uniquement pour backtracking et si pas déjà résolu)
             if selected_algo == 2 and not solved:
+                solve_button = pygame.Rect(WIDTH // 2 - 150, HEIGHT - 60, 100, 40)
+                pygame.draw.rect(window, SECONDARY_COLOR, solve_button, border_radius=10)
+                pygame.draw.rect(window, SHADOW_COLOR, solve_button, 3, border_radius=10)
+                solve_text = button_font.render("Solve", True, WHITE)
+                window.blit(solve_text, (solve_button.centerx - solve_text.get_width() // 2,
+                                        solve_button.centery - solve_text.get_height() // 2))
+
+            if selected_algo == 1 and not solved:
                 solve_button = pygame.Rect(WIDTH // 2 - 150, HEIGHT - 60, 100, 40)
                 pygame.draw.rect(window, SECONDARY_COLOR, solve_button, border_radius=10)
                 pygame.draw.rect(window, SHADOW_COLOR, solve_button, 3, border_radius=10)
