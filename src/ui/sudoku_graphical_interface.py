@@ -166,15 +166,15 @@ def draw_menu_algo():
     return buttons
 
 def draw_level_buttons():
-    title = title_font.render("Choose a Level", True, WHITE)
+    title = title_font.render("Choose your Grid", True, WHITE)
     window.blit(title, (WIDTH // 2 - title.get_width() // 2, 40))
 
     levels = [
-        ("Easy", 1),
-        ("Intermediate", 2),
-        ("Difficult", 3),
-        ("Expert", 4),
-        ("Legendary", 5)
+        ("Grid 1", 1),
+        ("Grid 2", 2),
+        ("Grid 3", 3),
+        ("Grid 4", 4),
+        ("Grid 5", 5)
     ]
 
     buttons = []
