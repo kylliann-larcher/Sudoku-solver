@@ -8,6 +8,7 @@ import time
 # Add project root to path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
+from src.solvers.brute_force import BruteForceSolver
 from src.models.sudoku import SudokuGrid
 from src.solvers.backtracking import BacktrakingceSolver
 
@@ -266,6 +267,18 @@ def main():
 
                     # Bouton Solve
                     solve_button = pygame.Rect(WIDTH // 2 - 100, HEIGHT - 110, 200, 40)
+                    if solve_button.collidepoint(event.pos) and selected_algo == 1 and not solved and not is_solving:
+                        solver = BruteForceSolver(sudoku)
+                        is_solving = True
+                        # Solve the grid with graphical updates
+                        while not solver.BruteForceGraph(grid, window,BACKGROUND_COLOR):
+                            pygame.display.flip()
+
+                        is_solving = False
+                        solved = True
+                        solving_time = time.time() - start_time  # Total solving time
+
+
                     if solve_button.collidepoint(event.pos) and selected_algo == 2 and not solved and not is_solving:
                         solver = BacktrakingceSolver(sudoku)
                         start_time = time.time_ns()
@@ -296,6 +309,15 @@ def main():
             window.blit(back_text, (back_button.centerx - back_text.get_width() // 2, 
                                   back_button.centery - back_text.get_height() // 2))
 
+
+            if selected_algo == 1 and not solved and not is_solving:
+                solve_button = pygame.Rect(WIDTH // 2 - 100, HEIGHT - 110, 200, 40)
+                pygame.draw.rect(window, SECONDARY_COLOR, solve_button, border_radius=10)
+                solve_text = button_font.render("Solve", True, WHITE)
+                window.blit(solve_text, (solve_button.centerx - solve_text.get_width() // 2,
+                                        solve_button.centery - solve_text.get_height() // 2))
+
+
             # Bouton Solve (seulement pour l'algorithme 2 et si pas déjà résolu)
             if selected_algo == 2 and not solved and not is_solving:
                 solve_button = pygame.Rect(WIDTH // 2 - 100, HEIGHT - 110, 200, 40)
@@ -303,6 +325,8 @@ def main():
                 solve_text = button_font.render("Solve", True, WHITE)
                 window.blit(solve_text, (solve_button.centerx - solve_text.get_width() // 2,
                                        solve_button.centery - solve_text.get_height() // 2))
+
+
 
             # Affichage du chronomètre
             timer_y = MARGIN_TOP + GRID_HEIGHT + 10
